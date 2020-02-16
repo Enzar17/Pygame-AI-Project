@@ -21,9 +21,9 @@ class Agent:
                + "\nVelocity: " + str(self.velocity) + "\nSize: " + str(self.size))
 
     # Draw the enemy to the screen
-    def draw(self, screen):
+    def draw(self, screen, color):
         """Draws the enemy to the screen that is passed in"""
-        pygame.draw.rect(screen, (255,255,255), self.drawRect)
+        pygame.draw.rect(screen, color, self.drawRect)
 
         # Calculate the movement vector from the center of the enemy
         self.movementVector = self.center + Vector.scale(self.velocity, 5)
@@ -49,12 +49,12 @@ class Agent:
         self.center = Vector(self.position.x + (self.size/2.0), self.position.y + (self.size/2.0))
 
         # Change over our canTag if need be
-        if switchTag:
-            self.canTag = True
+        if self.canTag == True:
+
 
     def collision(self, other):
         if self.drawRect.colliderect(other.drawRect) and self.canTag == True:
-            pygame.time.set_timer(USEREVENT, 1000, True)
+            #pygame.time.set_timer(USEREVENT, 1000, True)
             self.canTag = False
             return True
         else:

@@ -14,12 +14,12 @@ class Enemy(Agent):
         self.seek = True        # We need this variable later for behavior
 
     # Draw some unique stuff for our enemy
-    def draw(self, player, screen):
+    def draw(self, player, screen, color, target):
         """Draws an extra line from the enemy to the player if it is active"""
-        super().draw(screen)
+        super().draw(screen, color)
 
         if Vector.length(self.velocity) != 0:
-            pygame.draw.line(screen, (255,0,0), (self.center.x, self.center.y), (player.center.x, player.center.y), 3)
+            pygame.draw.line(screen, (255,0,0), (self.center.x, self.center.y), (target.x, target.y), 3)
 
     # Update the enemy's values
     def update(self, player, screenBounds, canSwitchTag):
