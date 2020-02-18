@@ -1,14 +1,24 @@
-from Vector import Vector
+##########################################################
+# Author: Liam McAleavey
+# Date: 2/18/2020
+# Email: lmcaleav@uccs.edu
+#
+# This comprises the logic of the player object, which inherits
+# most of its functionality from the Agent class, but needs 
+# unique player control in its update function
+###########################################################
 
+# Import everything we'll need
 import pygame
 from pygame.locals import *
 
-import Constants
 from Agent import Agent
+from Vector import Vector
+
+import Constants
 
 class Player(Agent):
-    # Update the player's values
-    def update(self, screenBounds, canSwitchTag):
+    def update(self, screenBounds):
         """Updates the enemy's position and velocity"""
         pressed = pygame.key.get_pressed()
 
@@ -22,4 +32,5 @@ class Player(Agent):
         elif pressed[pygame.K_d] or pressed[pygame.K_RIGHT]: self.velocity.x = 1
         else: self.velocity.x = 0
 
-        super().update(screenBounds, canSwitchTag)
+        # Take care of the rest of update with Agent's update method
+        super().update(screenBounds)

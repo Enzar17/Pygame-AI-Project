@@ -1,38 +1,42 @@
-from Vector import Vector
-from Enemy import Enemy
-from Agent import Agent
-import Constants
+##########################################################
+# Author: Liam McAleavey
+# Date: 2/18/2020
+# Email: lmcaleav@uccs.edu
+#
+# Defines behavior that is unique to our enemy hunter object,
+# which is really just the calculation of a different target to
+# manifest the pursue and evade behaviors
+###########################################################
 
+# Import everything we'll need
 import pygame
 from pygame.locals import *
 
+from Vector import Vector
+from Enemy import Enemy
+
+import Constants
+
 class EnemyHunter(Enemy):
-    # We need this variable later for behavior
-    def __init__(self, vecPosition, size, speed):
-        super().__init__(vecPosition, size, speed)
-        self.pursue = True       # We need this variable later for behavior
+    def __init__(self, vecPosition, size, speed, color):
+        '''Create an enemy hunter with a starting position, size, speed, and color'''
+        super().__init__(vecPosition, size, speed, color)
+        self.targetTime = 0     # We'll use this to calcualte where the player WILL be
 
-    # Draw some unique stuff for our enemy
-    def draw(self, player, screen, color):
-        """Draws an extra line from the enemy to the player if it is active"""
-        super().draw(player, screen, color, (player.center + player.velocity))
+    def draw(self, player, screen, target):
+        '''Draw the enemy object, and draws a line from the enemy to the player if it is close'''
+        # Modify the target position
+        target = (player.center + Vector.scale(player.velocity, self.targetTime))
 
-    def update(self, player, screenBounds, canSwitchTag):
-        """Updates the enemy hunter's position and velocity"""
-        # Calculate a vector pointing at the player
-        self.target = (player.position + player.velocity) - self.position
+        # The Enemy's draw can handle the rest
+        super().draw(player, screen, target)
 
-        # If the player is within range, act
-        if Agent.collision(self, player) == True:
-            self.pursue = not self.pursue
+    def calculateTargetVector(self, player):
+        '''Calculate the vector to our target for the pursue behavior'''
+        # Calculate the amount of time it would take to reach the player
+        self.targetTime = Vector.length(player.center - self.center) / Constants.ENEMY_SPEED
+        Vector.normalize(player.velocity)
+        target = (player.center + Vector.scale(player.velocity, self.targetTime))
 
-        if Vector.length(self.target) < Constants.ENEMY_ATTACK_RANGE and self.seek == True:
-            self.velocity = self.target
-
-        elif Vector.length(self.target) < Constants.ENEMY_ATTACK_RANGE and self.seek == False:
-            self.velocity = Vector(-self.target.x, -self.target.y)
-
-        else:
-            self.velocity = Vector(0, 0)
-
-        Agent.update(self, screenBounds, canSwitchTag)
+        targetVector = target - self.center
+        return targetVector

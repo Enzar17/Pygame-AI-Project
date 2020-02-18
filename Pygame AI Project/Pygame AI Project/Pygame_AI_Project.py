@@ -1,3 +1,14 @@
+##########################################################
+# Author: Liam McAleavey
+# Date: 2/18/2020
+# Email: lmcaleav@uccs.edu
+#
+# This comprises the logic of the main function of our game.
+# It establishes the pygame environment, and creates a number
+# of objects that act and interact within the game.
+###########################################################
+
+
 # Import everything we'll need
 import pygame
 from pygame.locals import *
@@ -8,26 +19,37 @@ from Enemy import Enemy
 from EnemyHunter import EnemyHunter
 
 import Constants
+import random
 
 # Define our main method
 def main():
-    # Initizalize pygame, create an 800 x 600 display, and fill it with cornflower blue
+    # Initizalize pygame, create a display defined in the Constants, and fill it
+    # with a background
     pygame.init()
     screen = pygame.display.set_mode((Constants.WORLD_WIDTH, Constants.WORLD_HEIGHT))
     screen.fill(Constants.BACKGROUND_COLOR)
 
     # Create a Player object
-    player = Player(Vector((Constants.WORLD_WIDTH / 2.0), (Constants.WORLD_HEIGHT / 2.0)),
-                    Constants.PLAYER_SIZE, Constants.PLAYER_SPEED)
+    player = Player(Vector((Constants.WORLD_WIDTH / 2.0), (Constants.WORLD_HEIGHT / 2.0)), \
+                    Constants.PLAYER_SIZE, Constants.PLAYER_SPEED, Constants.PLAYER_COLOR)
 
-    # Create an enemy object
-    enemy = Enemy(Vector(100, 100), Constants.ENEMY_SIZE, Constants.ENEMY_SPEED)
+    enemyList = []      # Create a list of enemies
 
-    # Create an enemy hunter object
-    enemyHunter = EnemyHunter(Vector(300, 100), Constants.ENEMY_SIZE, 3)
+    # Populate the list with 5 normal enemies
+    for i in range(5):
+        newEnemy = Enemy(Vector(random.randint(0, Constants.WORLD_WIDTH - Constants.ENEMY_SIZE),   \
+                                random.randint(0, Constants.WORLD_HEIGHT) - Constants.ENEMY_SIZE), \
+                         Constants.ENEMY_SIZE, Constants.ENEMY_SPEED, Constants.ENEMY_COLOR)
 
-    # Create an event check for the no-tag-backs feature
-    canSwitchTag = False
+        list.append(enemyList, newEnemy)
+
+    # Populate the list with 5 more enemy hunters
+    for i in range(5):
+        newEnemy = EnemyHunter(Vector(random.randint(0, Constants.WORLD_WIDTH - Constants.ENEMY_SIZE),   \
+                                      random.randint(0, Constants.WORLD_HEIGHT) - Constants.ENEMY_SIZE), \
+                               Constants.ENEMY_SIZE, Constants.ENEMY_SPEED, Constants.ENEMY_HUNTER_COLOR)
+
+        list.append(enemyList, newEnemy)
 
     # Create a clock object so we can correctly calculate 60fps
     clock = pygame.time.Clock()
@@ -41,30 +63,18 @@ def main():
             if event.type == pygame.QUIT:
                 done = True
 
-        # Always refresh the screen with cornflower blue
+        # Always refresh the screen with our background
         screen.fill(Constants.BACKGROUND_COLOR)
 
-        # Check the noTagBacksEvent
-        if pygame.event.get(pygame.USEREVENT):
-            canSwitchTag = True
-            print("It's ON")
-
         # Update and draw our player
-        player.update(Vector(Constants.WORLD_WIDTH, Constants.WORLD_HEIGHT), canSwitchTag)
-        player.draw(screen, Constants.PLAYER_COLOR)
+        player.update(Vector(Constants.WORLD_WIDTH, Constants.WORLD_HEIGHT))
+        player.draw(screen)
 
-        # Update and draw our enemy
-        enemy.update(player, Vector(Constants.WORLD_WIDTH, Constants.WORLD_HEIGHT), canSwitchTag)
-        enemy.draw(player, screen, Constants.ENEMY_COLOR, player.center)
-
-        # Update and draw our enemy hunter
-        enemyHunter.update(player, Vector(Constants.WORLD_WIDTH, Constants.WORLD_HEIGHT), canSwitchTag)
-        enemyHunter.draw(player, screen, Constants.ENEMY_HUNTER_COLOR)
-
-        # Now that the update is over, turn our canSwitchTag off if necessary
-        if canSwitchTag:
-            canSwitchTag = False
-            print("It's OFF")
+        # Update and draw our list of enemies
+        for enemy in enemyList:
+            enemy.update(player, Vector(Constants.WORLD_WIDTH, Constants.WORLD_HEIGHT), \
+                enemy.calculateTargetVector(player))
+            enemy.draw(player, screen, player.center)
 
         # Flip the double-buffered display
         pygame.display.flip()
